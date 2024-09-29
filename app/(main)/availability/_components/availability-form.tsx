@@ -23,7 +23,7 @@ const AvailabilityForm = ({ initialData }) => {
     defaultValues: initialData,
   });
 
-  const { fn: fnUpdateAvailability, loading, error } = useFetch(updateAvailability)
+  const { fn: fnUpdateAvailability, loading } = useFetch(updateAvailability)
 
   const onSubmit = async (data) => {
     await fnUpdateAvailability(data);

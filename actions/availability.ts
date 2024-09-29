@@ -20,13 +20,16 @@ export async function getUserAvailability() {
     },
   });
 
-  if (!user || !user.availability) {
-    return null; // User or availability not found
+  if (!user) {
+    throw new Error("User not found");
   }
 
-  // Transform the availability data into the format expected by the form
-  const availabilityData = { timeGap: user.availability.timeGap };
+  // Initialize availabilityData
+  const availabilityData = {
+    timeGap: user.availability ? user.availability.timeGap : null,
+  };
 
+  // Define the days of the week
   const daysOfWeek = [
     "monday",
     "tuesday",
@@ -37,9 +40,9 @@ export async function getUserAvailability() {
     "sunday",
   ];
 
+  // Iterate over days and check availability
   daysOfWeek.forEach((day) => {
-    // Check if user.availability.days is not null and has the find method
-    const dayAvailability = user.availability.days?.find(
+    const dayAvailability = user.availability?.days?.find(
       (d) => d.day === day.toUpperCase()
     );
 
@@ -47,10 +50,10 @@ export async function getUserAvailability() {
       isAvailable: !!dayAvailability,
       startTime: dayAvailability
         ? dayAvailability.startTime.toISOString().slice(11, 16)
-        : "09:00",
+        : "09:00", // Default start time
       endTime: dayAvailability
         ? dayAvailability.endTime.toISOString().slice(11, 16)
-        : "17:00",
+        : "17:00", // Default end time
     };
   });
 

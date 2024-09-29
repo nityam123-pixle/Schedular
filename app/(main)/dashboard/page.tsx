@@ -12,7 +12,7 @@ import useFetch from "@/hooks/useFetch";
 import { updateUsername } from "@/actions/user";
 import { BarLoader } from "react-spinners";
 import { getLatestUpdates } from "@/actions/dashboard";
-import { format } from 'date-fns'
+import { format } from 'date-fns';
 
 const Dashboard = () => {
   const { isLoaded, user } = useUser();
@@ -26,11 +26,14 @@ const Dashboard = () => {
     resolver: zodResolver(usernameSchema),
   });
 
+  // Added user as a dependency
   useEffect(() => {
-    setValue("username", user?.username);
-  }, [isLoaded]);
+    if (isLoaded && user) {
+      setValue("username", user.username);
+    }
+  }, [isLoaded, user, setValue]);
 
-  const { loading, error, fn: fnUpdateUsername } = useFetch(updateUsername)
+  const { loading, error, fn: fnUpdateUsername } = useFetch(updateUsername);
 
   const onSubmit = async (data) => {
     fnUpdateUsername(data.username);
@@ -42,9 +45,10 @@ const Dashboard = () => {
     fn: fnUpdates,
   } = useFetch(getLatestUpdates);
 
+  // Added fnUpdates as a dependency
   useEffect(() => {
     (async () => await fnUpdates())();
-  }, []);
+  }, [fnUpdates]);
 
   return (
     <div className="space-y-8">
@@ -53,18 +57,15 @@ const Dashboard = () => {
           <CardTitle>Welcome, {user?.firstName}</CardTitle>
         </CardHeader>
         <CardContent>
-        {!loadingUpdates ? (
+          {!loadingUpdates ? (
             <div className="space-y-6 font-light">
               <div>
-                {upcomingMeetings && upcomingMeetings?.length > 0 ? (
+                {upcomingMeetings && upcomingMeetings.length > 0 ? (
                   <ul className="list-disc pl-5">
-                    {upcomingMeetings?.map((meeting) => (
+                    {upcomingMeetings.map((meeting) => (
                       <li key={meeting.id}>
                         {meeting.event.title} on{" "}
-                        {format(
-                          new Date(meeting.startTime),
-                          "MMM d, yyyy h:mm a"
-                        )}{" "}
+                        {format(new Date(meeting.startTime), "MMM d, yyyy h:mm a")}{" "}
                         with {meeting.name}
                       </li>
                     ))}
